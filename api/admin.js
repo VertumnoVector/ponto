@@ -18,8 +18,7 @@ router.get("/", checkAuthenticated, (req, res) => {
         );
 
     } else {
-        console.log('dasdsad')
-        //res.redirect("/dashboard");
+        res.redirect("/dashboard");
     }
 });
 
