@@ -8,6 +8,7 @@ const passport = require("passport");
 
 
 const app = express();
+
 const PORT = process.env.PORT || 4000;
 
 app.set('view engine', 'ejs');
@@ -15,6 +16,8 @@ app.set('views', path.join(__dirname, 'views')); //default views path
 app.use(express.static(__dirname + '/assets')); //bootstrap path
 
 app.use(express.urlencoded({ extended: false }));
+
+app.use(express.json());
 
 const initializePassport = require("./config/passportConfig");
 

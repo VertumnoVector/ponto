@@ -31,11 +31,7 @@
             </div>
         </nav>
     </header>
-    <ul>
-        <% if (typeof errors !='undefined' ) { %>
-            <% console.log('reste') %>
-                <% } %>
-    </ul>
+
     <div class="container-fluid">
         <div class="row justify-content-center">
             <div class="col-auto">
@@ -58,17 +54,33 @@
                     <div class="tab-pane fade show active" id="funcionarios" role="tabpanel"
                         aria-labelledby="funcionarios-tab">
                         <h2 class="m-3">Funcionários</h2>
-                        <table id="myTable" class="display">
+                        <table id="usersTable" class="display">
                             <thead>
                                 <tr>
-                                    <th>Nome</th>
-                                    <th>Matrícula</th>
-                                    <th>Admin</th>
+                                    <th>Id</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
                                     <th>Opções</th>
                                 </tr>
                             </thead>
                             <tbody>
-                              
+                                <% users.forEach(function(user) { %>
+                                    <% if (user.isadmin !==true) { %> <!-- Verifica se o usuário não é admin -->
+                                        <tr>
+                                            <td>
+                                                <%= user.id %>
+                                            </td>
+                                            <td>
+                                                <%= user.username %>
+                                            </td>
+                                            <td>
+                                                <%= user.email %>
+                                            </td>
+                                            <td><button class="btn btn-danger" data-user-id="<%= user.id %>"
+                                                    onclick="deleteUser('<%= user.id %>')">Delete</button></td>
+                                        </tr>
+                                        <% } %>
+                                            <% }); %>
                             </tbody>
                         </table>
                     </div>
@@ -145,12 +157,35 @@
 
     <script>
         $(document).ready(function () {
-            $('#myTable').DataTable({
+            // Inicializa o DataTables na tabela
+            const dataTable = $('#usersTable').DataTable({
                 "language": {
                     "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese.json"
                 }
             });
         });
+    </script>
+    <script>
+        function deleteUser(userId) {
+            // Envia uma solicitação POST para a rota de exclusão com o ID do usuário
+            fetch('/admin/delete', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ userId: userId })
+            })
+                .then(response => {
+                    if (response.ok) {
+                        window.location.reload(); // ou outra ação que você deseja fazer após a exclusão
+                    } else {
+                        console.error('Erro ao excluir usuário:', response.statusText);
+                    }
+                })
+                .catch(error => {
+                    console.error('Erro ao excluir usuário:', error);
+                });
+        }
     </script>
 </body>
 

@@ -4,14 +4,22 @@ const router = express.Router();
 const { pool } = require('../config/dbConfig');
 const bcrypt = require("bcrypt");
 
-
-
-
 router.get("/", checkAuthenticated, (req, res) => {
     if (req.user.isadmin) {
-        res.render("adminPanel");
+        pool.query(
+            `SELECT id, username, email, isadmin FROM users order by id`,
+            (err, results) => {
+                if (err) {
+                    console.log(err);
+                } else {
+                    res.render("adminPanel", { users: results.rows });
+                }
+            }
+        );
+
     } else {
-        res.redirect("/dashboard");
+        console.log('dasdsad')
+        //res.redirect("/dashboard");
     }
 });
 
@@ -79,6 +87,20 @@ router.post("/create", async (req, res) => {
 
 });
 
+router.post("/delete", checkAuthenticated, async (req, res) => {
+    const userId = req.body.userId;
+
+    try {
+        // Implemente a lógica para excluir o usuário do banco de dados
+        await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
+
+        // Envie uma resposta de sucesso
+        res.sendStatus(200);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send("Erro ao excluir usuário");
+    }
+});
 
 function checkAuthenticated(req, res, next) {
     if (req.isAuthenticated()) {
