@@ -15,9 +15,7 @@ async function getJornada(user_id) {
 async function verificarRegistroExistente(user_id) {
   const query = `
     SELECT id FROM registro_de_pontos
-    WHERE user_id = $1
-    AND starttime >= CURRENT_DATE
-    AND stoptime < CURRENT_DATE + INTERVAL '1 day';`;
+    WHERE user_id = $1;`;
 
   const values = [user_id];
 
@@ -28,9 +26,7 @@ async function verificarRegistroExistente(user_id) {
 async function isIdPar(id) {
   const query = `
     SELECT id FROM registro_de_pontos
-    WHERE user_id = $1;
-    AND starttime >= CURRENT_DATE
-    AND stoptime < CURRENT_DATE + INTERVAL '1 day';`;
+    WHERE user_id = $1;`;
 
   const values = [id];
   const result = await pool.query(query, values);
@@ -56,9 +52,9 @@ router.get('/', checkAuthenticated, async (req, res) => {
       `
       SELECT id, starttime, stoptime 
       FROM registro_de_pontos
-      WHERE user_id = 4
-      AND stoptime >= CURRENT_DATE
-      AND stoptime < CURRENT_DATE + INTERVAL '1 day'
+      WHERE user_id = $1
+      AND (starttime >= CURRENT_DATE AND starttime < CURRENT_DATE + INTERVAL '1 day'
+         OR stoptime >= CURRENT_DATE AND stoptime < CURRENT_DATE + INTERVAL '1 day')
       ORDER BY id ASC;`,
       [req.user.id],
       (err, results) => {
