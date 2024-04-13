@@ -46,7 +46,6 @@ router.get('/', checkAuthenticated, async (req, res) => {
   // Captura o total de horas da jornada
   try {
     const jornada = await getJornada(req.user.id);
-    console.log(jornada);
 
     // Popular a tabela dos horários
     pool.query(

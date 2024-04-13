@@ -50,7 +50,8 @@
                 </div>
             </div>
             <div class="row justify-content-center mb-3">
-                <div class="col-auto mt-1 col-sm-6"> <!-- Adicionado col-sm-6 para ocupar 50% da largura em dispositivos pequenos -->
+                <div class="col-auto mt-1 col-sm-6">
+                    <!-- Adicionado col-sm-6 para ocupar 50% da largura em dispositivos pequenos -->
                     <div class="card clock-card">
                         <div class="card-body">
                             <h5 class="card-title">Agora</h5>
@@ -58,69 +59,104 @@
                         </div>
                     </div>
                 </div>
-                <div class="col-auto mt-1 col-sm-6"> <!-- Adicionado col-sm-6 para ocupar 50% da largura em dispositivos pequenos -->
+                <div class="col-auto mt-1 col-sm-6">
+                    <!-- Adicionado col-sm-6 para ocupar 50% da largura em dispositivos pequenos -->
                     <div class="card clock-card">
                         <div class="card-body">
-                            <h5 class="card-title">Fim da jornada</h5>
-                            <p class="card-text clock" id="timeLeft"><%=jornada%></p>
+                            <h5 class="card-title">Fim da jornada em</h5>
+                            <p class="card-text clock" id="timeLeft">
+                                <% 
+                                if (results && results.length > 0) {
+
+                                    let startTime = new Date(results[0].starttime);
+                                    let stopTime = 0;
+                                    
+                                    if(results[results.length - 1].stoptime == null){
+                                        stopTime = new Date(results[results.length - 1].starttime);
+                                    }
+
+                                    if(results[results.length - 1].stoptime != null){
+                                        stopTime = new Date(results[results.length - 1].stoptime);
+                                    }
+
+                                    if (stopTime < startTime) {
+                                            startTime = stopTime;
+                                    } 
+                                    
+                                    let diferencaMs = stopTime - startTime;
+                                    let diferencaMinutos = Math.floor(diferencaMs / (1000 * 60));
+                                
+                                    let leftTime = jornada - diferencaMinutos;
+                                    let horas = Math.floor(leftTime / 60);
+                                    let minutos = leftTime % 60;
+                                    let tempoFormatado = (horas < 10 ? '0' + horas : horas) + ':' + (minutos < 10 ? '0' + minutos : minutos);
+                                %>
+                                    <%= tempoFormatado %>
+                                <% } else { %>
+                                    <%= 'Nenhum resultado disponível.' %>
+                                <% } %>
+                                
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-        <hr>
-        <div class="row justify-content-center">
-            <div class="col-auto roboto-medium">
-                <ul class="nav nav-tabs" id="myTab" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link active" id="controle-tab" data-bs-toggle="tab" href="#controle" role="tab"
-                            aria-controls="controle" aria-selected="true">Controle</a>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <a class="nav-link" id="cadastro-tab" data-bs-toggle="tab" href="#cadastro" role="tab"
-                            aria-controls="cadastro" aria-selected="false">Nova Entrada/Saída</a>
-                    </li>
-                </ul>
-                <div class="tab-content" id="myTabContent">
-                    <div class="tab-pane fade show active" id="controle" role="tabpanel" aria-labelledby="controle-tab">
-                        <h2 class="m-3">Histórico</h2>
-                        <table id="pontosTable" class="display">
-                            <thead>
-                                <tr>
-                                    <th>Entrada</th>
-                                    <th>Saída</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <% if (results && results.length > 0) { %>
-                                    <% results.forEach(function(result) { %>
-                                        <tr>
-                                            <td>
-                                                <%= result.starttime ? new Date(result.starttime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-' %>
-                                            </td>
-                                            <td>
-                                                <%= result.stoptime ? new Date(result.stoptime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-' %>
-                                            </td>
-                                        </tr>
+    <hr>
+    <div class="row justify-content-center">
+        <div class="col-auto roboto-medium">
+            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link active" id="controle-tab" data-bs-toggle="tab" href="#controle" role="tab"
+                        aria-controls="controle" aria-selected="true">Controle</a>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <a class="nav-link" id="cadastro-tab" data-bs-toggle="tab" href="#cadastro" role="tab"
+                        aria-controls="cadastro" aria-selected="false">Nova Entrada/Saída</a>
+                </li>
+            </ul>
+            <div class="tab-content" id="myTabContent">
+                <div class="tab-pane fade show active" id="controle" role="tabpanel" aria-labelledby="controle-tab">
+                    <h2 class="m-3">Histórico</h2>
+                    <table id="pontosTable" class="display">
+                        <thead>
+                            <tr>
+                                <th>Entrada</th>
+                                <th>Saída</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <% if (results && results.length> 0) { %>
+                                <% results.forEach(function(result) { %>
+                                    <tr>
+                                        <td>
+                                            <%= result.starttime ? new Date(result.starttime).toLocaleTimeString([],
+                                                {hour: '2-digit' , minute:'2-digit'}) : '-' %>
+                                        </td>
+                                        <td>
+                                            <%= result.stoptime ? new Date(result.stoptime).toLocaleTimeString([],
+                                                {hour: '2-digit' , minute:'2-digit'}) : '-' %>
+                                        </td>
+                                    </tr>
                                     <% }); %>
-                                <% } %>
-                            </tbody>
-                        </table>
-                    </div>
+                                        <% } %>
+                        </tbody>
+                    </table>
+                </div>
 
-                    <div class="tab-pane fade" id="cadastro" role="tabpanel" aria-labelledby="cadastro-tab">
-                        <h2 class="m-3 text text-center">Novo registro</h2>
-                        <form action="dashboard/create/" method="POST">
-                            <div class="mb-3">
-                                <input type="hidden" name="user_id" value="<%= user_id%>">
-                                <input type="submit" class="btn btn-success w-100" value="Novo ponto">
-                            </div>
-                        </form>
-                    </div>
+                <div class="tab-pane fade" id="cadastro" role="tabpanel" aria-labelledby="cadastro-tab">
+                    <h2 class="m-3 text text-center">Novo registro</h2>
+                    <form action="dashboard/create/" method="POST">
+                        <div class="mb-3">
+                            <input type="hidden" name="user_id" value="<%= user_id%>">
+                            <input type="submit" class="btn btn-success w-100" value="Novo ponto">
+                        </div>
+                    </form>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 
 
@@ -164,7 +200,7 @@
         });
     </script>
 
-   
+
 </body>
 
 </html>
