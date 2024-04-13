@@ -38,57 +38,263 @@ Este é um desafio da Logique Inteligência em sistemas. Consiste no controle de
 ![Logo](https://lh3.googleusercontent.com/drive-viewer/AKGpihYoHpnixA55_3C--7X-_D3_V8dcb6S-qhgKltfCZtjOzHMF3Rvsb3wRFoxCtCHXdF8DoPqJRId9QeEOIWi2HYOstomFS7hPfdM=w1860-h885-v0)
 
 
-## Documentação da API
+# Documentação da API
 
-#### Rota de Login
-
+## Arquivo de Roteamento Principal
+### Descrição
+o arquivo (`api/index`) é responsável por definir as rotas principais da aplicação e redirecionar as requisições para os roteadores específicos.
+### Rota Principal definida
 ```http
   GET /login
 ```
+| Descrição                           |
+| :---------------------------------- |
+| Redireciona para a página de login (`/login`) por padrão |
 
+
+## END-POINT LOGIN
+
+```http
+  POST /login
+```
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
-| `api_key` | `string` | **Obrigatório**. username |
-| `api_key` | `string` | **Obrigatório**. password |
+| `req.body` | `string` | **Obrigatório** {username: string, password: string} |
 
-## ADMINISTRADOR
-#### Retorna todos os usuários
+### Descrição
+Esta rota é usada para autenticar o usuário durante o processo de login. Ela utiliza a estratégia de autenticação local configurada com Passport.js.
+
+### Comportamento
+- Se a autenticação for bem-sucedida, o usuário é redirecionado para a página do dashboard (`/dashboard`).
+- Se a autenticação falhar, o usuário é redirecionado de volta para a página de login (`/login`) com uma mensagem de erro exibida.
+- Na rota (`/dashboard`), mais a frente, é que será determina o direcionamento para (`/admin`), se o usuário autenticado for um administrador comparando o retorno do `req.user.isadmin`.
+
+### Exemplo de Uso
+```javascript
+fetch('/login', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ username: 'seu-username', password: 'sua-senha' })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+  ```
+
+## END-POINTS DO ADMINISTRADOR
+## Retorna todos os usuários
 
 ```http
   GET /admin/
+  Autenticação necessária: Sim (middleware `checkAuthenticated`)
 ```
-#### Rota de inclusão de usuário
+### Descrição
+Esta rota é usada para acessar a página de administração. Ela lista todos os usuários registrados no sistema para visualização e gerenciamento, dando ao administrador a opção de (`/delete`), se necessário.
+
+### Comportamento
+- Verifica se o usuário está autenticado e é um administrador.
+- Consulta o banco de dados para obter informações de todos os usuários.
+- Renderiza a página `adminPanel` com a lista de usuários.
+
+### Exemplo de Uso
+```javascript
+fetch('/', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer seu-token-de-autenticacao'
+  }
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+  ```
+
+## Rota de inclusão de usuário
 ```http
   POST /admin/create
+  Autenticação necessária: Sim (checkAuthenticated middleware)
 ```
-
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
-| `req.body` | `application/json` | **Obrigatório**. name, email, password, password2 |
+| `req.body` | `application/json` | **Obrigatório**. {name:string, email:string, password:string, password2:string} |
 
-#### Rota de exclusão de usuário comum
+### Descrição
+Esta rota é responsável por criar um novo usuário comum no sistema. Ela recebe os dados do usuário através de uma requisição POST e executa uma série de validações antes de inserir os dados no banco de dados.
+### Lógica de validação
+1. Verifica se todos os campos obrigatórios estão preenchidos.
+2. Verifica se a senha possui pelo menos 6 caracteres.
+3. Verifica se a senha e a confirmação de senha são iguais.
+
+### Respostas
+- **200 OK**: Se o usuário for criado com sucesso.
+- **400 Bad Request**: Se houver erros nos parâmetros da requisição ou nos dados fornecidos.
+- **500 Internal Server Error**: Se ocorrer algum erro interno no servidor durante o processo de criação do usuário.
+## Exemplo de Uso
+
+```javascript
+fetch('/create', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify({
+    name: 'John Doe',
+    email: 'johndoe@example.com',
+    timeleft: '30 days',
+    password: 'mypassword',
+    password2: 'mypassword',
+  }),
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+  ```
+
+## Rota de exclusão de usuário comum
 
 ```http
   POST /admin/delete
+  Autenticação necessária: Sim (checkAuthenticated middleware)
 ```
 
 | Parâmetro   | Tipo       | Descrição                           |
 | :---------- | :--------- | :---------------------------------- |
-| `req.body` | `application/json` | **Obrigatório**. UserId |
+| `req.body` | `application/json` | **Obrigatório**. {UserId :int} |
+
+### Descrição
+Esta rota é responsável por excluir um usuário do banco de dados com base no ID fornecido no corpo da requisição.
+### Lógica de exclusão
+1. Recebe o ID do usuário a ser excluído do corpo da requisição.
+2. Executa a lógica para excluir o usuário do banco de dados usando o ID fornecido.
+### Respostas
+- **200 OK**: Se o usuário for excluído com sucesso.
+- **400 Bad Request**: Se houver erros nos parâmetros da requisição ou nos dados fornecidos.
+- **500 Internal Server Error**: Se ocorrer algum erro interno no servidor durante o processo de exclusão do usuário.
+### Exemplo de Uso
+```javascript
+fetch('/', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer seu-token-de-autenticacao'
+  }
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+  ```
+
+
+#### Funções do controller 
+
+```javascript
+function checkAuthenticated(req, res, next) 
+
+//verifica a autenticação
+```
 
 
 
-#### checkAuthenticated(req, res, next)
 
-Verifica o estado de autenticação para operação do administrador.
+## END-POINTS DO USUARIO COMUM
+## Rota index do usuário comum
+```http
+  GET /dashboard/
+  Autenticação necessária: Sim (checkAuthenticated middleware)
+```
+### Descrição
+Esta rota é usada para renderizar a página inicial do dashboard. Se o usuário for um administrador, ele será redirecionado para a página de administração (`/admin`). Caso contrário, o dashboard do usuário será renderizado, mostrando seus registros de ponto e jornada de trabalho com base nos dados obtidos do banco de dados.
+### Respostas
+- **200 OK:** A página do dashboard é renderizada com sucesso.
+- **302 Found:** Redireciona para /admin se o usuário for um administrador.
+- **500 Internal Server Error:** Em caso de falha ao buscar os registros de ponto ou jornada de trabalho.
+### Exemplo de Uso
+```javascript
+fetch('/', {
+  method: 'GET',
+  headers: {
+    'Authorization': 'Bearer seu-token-de-autenticacao'
+  }
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+  ```
+
+
+## Rota de inclusão de registro de ponto
+```http
+  POST /dashboard/create
+```
+### Descrição
+Esta rota é usada para criar um novo registro de pontos para um usuário com base no ID fornecido no corpo da requisição. Se o usuário já tiver um registro existente, o horário de início ou término será definido com base na paridade do seu ID.
+### Parâmetros do Corpo da Requisição
+- **user_id** (String, obrigatório): O ID do usuário para o qual o registro de pontos será criado.
+
+
+### Lógica de Criação do Registro de Pontos
+1. Verifica se já existe um registro para o `user_id`.
+2. Se não houver registro, define o `starttime` como a hora atual.
+3. Se houver registro, determina se o ID é par ou ímpar.
+   - Se o ID for par, define o `stoptime` como a hora atual.
+   - Se o ID for ímpar, define o `starttime` como a hora atual.
+
+| Parâmetro   | Tipo       | Descrição                           |
+| :---------- | :--------- | :---------------------------------- |
+| `req.body` | `application/json` |  {UserId :int} |
+
+### Respostas
+- **201 Created:** O registro de pontos foi criado com sucesso. Retorna o registro criado.
+- **500 Internal Server Error:** Em caso de falha ao inserir o registro de pontos.
+### Exemplo de Uso
+```javascript
+fetch('/create', {
+  method: 'POST',
+  headers: {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({ user_id: 'id-do-usuario' })
+})
+  .then(response => response.json())
+  .then(data => console.log(data))
+  .catch(error => console.error('Erro:', error));
+  ```
+#### Funções do controller
+```javascript
+async function getJornada(user_id) 
+
+// assíncrona para captura da jornada cadastrada pelo adm.
+```
+```javascript
+async function verificarRegistroExistente(user_id) 
+ 
+//verifica se tem pelo menos 1 registro de ponto lançado pelo usuário.
+//no end-point /dashboard/create é registrado como primeira entrada.
+```
+```javascript
+async function isIdPar(id)
+
+//depois de verificar se existe um lançamento e for verdadeiro,
+//esta função determina se o registro será uma entrada ou saída.
+//Caso o resto da divisão por 2 for 0 sempre será uma saída.
+//Se for diferente disto é a entrada ou retorno. 
+```
+
+
+
 
 
 ## Instalação
+## BACKEND
+Partindo do princípio que seu ambiente de desenvolvimento ja possua instalado o Node.js, basta seguir os passos abaixo, se não instale o node (https://nodejs.org/en/download) e continue.
 
-Dependências do projeto
+#### Clone do projeto
 
-## BACKEND 
-
+```bash
+  git clone https://github.com/usuario/nome-do-repositorio.git
+```
+#### Dependências do projeto
 ```bash
   npm i bcrypt
 ```
@@ -172,6 +378,14 @@ CREATE TABLE public.users  (
     name VARCHAR(255) not null
 );
 ALTER TABLE users ADD CONSTRAINT users_pk PRIMARY KEY (id);
+```
+```postgresql
+CREATE TABLE public.registro_de_pontos (
+    id serial PRIMARY KEY,
+    user_id bigint REFERENCES public.users(id),
+    starttime TIMESTAMP,
+	stoptime TIMESTAMP
+)
 ```
 
 ```postgresql
