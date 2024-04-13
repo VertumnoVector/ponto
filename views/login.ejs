@@ -43,31 +43,21 @@
     <div class="container-fluid custom-height">
         <div class="row h-100">
             <div class="col-sm-4 d-flex flex-column align-items-center justify-content-center" id="leftSide">
-                <ul>
-                    <% if (typeof errors !='undefined' ) { %>
-                        <% errors.forEach(error=> { %>
-                            <li>
-                                <%= error.message %>
-                            </li>
+                <div class="alert alert-success" role="alert">
+                        <% if (typeof errors !='undefined' ) { %>
+                            <% errors.forEach(error=> { %>
+                                <%= error.message %>      
                             <% }) %>
-                                <% } %>
-                </ul>
-
-                <ul>
-                    <% if(messages.success_msg) { %>
-                        <li>
-                            <%= messages.success_msg %>
-                        </li>
                         <% } %>
-                </ul>
-
-                <ul>
-                    <% if (messages.error) { %>
-                        <li>
-                            <%= messages.error %>
-                        </li>
+                        <% if(messages.success_msg) { %>         
+                                <%= messages.success_msg %> 
+                        <% } %>  
+                        <% if (messages.error) { %>
+                                <%= messages.error %> 
                         <% } %>
-                </ul>
+                    
+                </div>
+
 
                 <img src="../img/logo.png" alt="" id="imgLogo">
                 <h5 class="mt-1">Registro de Pontos</h5>
@@ -78,10 +68,12 @@
                     <div class="card-body">
                         <form action="/login/" method="POST">
                             <div class="mb-3 text-start">
-                                <input type="text" class="form-control" name="username" id="username" placeholder="Matrícula" required>
+                                <input type="text" class="form-control" name="username" id="username"
+                                    placeholder="Matrícula" required>
                             </div>
                             <div class="mb-3 text-start">
-                                <input type="password" class="form-control" name="password" id="password" placeholder="Senha" required>
+                                <input type="password" class="form-control" name="password" id="password"
+                                    placeholder="Senha" required>
                             </div>
                             <div class="mb-3 text-center">
                                 <input type="submit" class="btn btn-success" value="Login">
