@@ -4,55 +4,98 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css"
-        integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ=="
-        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="/scss/style.css">
     <title>Login</title>
+    <style>
+        body {
+            font-family: 'Roboto';
+        }
+
+        .custom-height {
+            height: 100vh;
+            /* Altura total da viewport */
+        }
+
+        #rightSide {
+            background-image: url('https://plus.unsplash.com/premium_photo-1663047060215-eaf3846564a7?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+            background-size: cover;
+            background-position: center;
+        }
+
+        #imgLogo {
+            width: 96px;
+            height: 96px;
+        }
+
+        form,
+        input,
+        button {
+            font-size: 0.875rem !important;
+        }
+
+        button {
+            width: 100%;
+        }
+    </style>
 </head>
 
 <body>
-    <h1>Login</h1>
+    <div class="container-fluid custom-height">
+        <div class="row h-100">
+            <div class="col-sm-4 d-flex flex-column align-items-center justify-content-center" id="leftSide">
+                <ul>
+                    <% if (typeof errors !='undefined' ) { %>
+                        <% errors.forEach(error=> { %>
+                            <li>
+                                <%= error.message %>
+                            </li>
+                            <% }) %>
+                                <% } %>
+                </ul>
 
-    <ul>
-        <% if (typeof errors !='undefined' ) { %>
-            <% errors.forEach(error=> { %>
-                <li>
-                    <%= error.message %>
-                </li>
-                <% }) %>
-                    <% } %>
-    </ul>
+                <ul>
+                    <% if(messages.success_msg) { %>
+                        <li>
+                            <%= messages.success_msg %>
+                        </li>
+                        <% } %>
+                </ul>
 
-    <ul>
-        <% if(messages.success_msg) { %>
-            <li>
-                <%= messages.success_msg %>
-            </li>
-            <% } %>
-    </ul>
+                <ul>
+                    <% if (messages.error) { %>
+                        <li>
+                            <%= messages.error %>
+                        </li>
+                        <% } %>
+                </ul>
 
-    <ul>
-        <% if (messages.error) { %>
-            <li>
-                <%= messages.error %>
-            </li>
-            <% } %>
-    </ul>
+                <img src="../img/logo.png" alt="" id="imgLogo">
+                <h5 class="mt-1">Registro de Pontos</h5>
+                <div class="card text-center mt-3" style="width: 80%;">
+                    <div class="card-header">
+                        Login
+                    </div>
+                    <div class="card-body">
+                        <form action="/login/" method="POST">
+                            <div class="mb-3 text-start">
+                                <input type="text" class="form-control" name="username" id="username" placeholder="Matrícula" required>
+                            </div>
+                            <div class="mb-3 text-start">
+                                <input type="password" class="form-control" name="password" id="password" placeholder="Senha" required>
+                            </div>
+                            <div class="mb-3 text-center">
+                                <input type="submit" class="btn btn-success" value="Login">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
 
-    <form action="/login/" method="POST">
-        <div>
-            <input type="text" name="username" id="username" placeholder="username" required>
+            <div class="col-sm-8 bg-secondary" id="rightSide">
+
+            </div>
         </div>
-        <div>
-            <input type="password" name="password" id="password" placeholder="password" required>
-        </div>
-        <div>
-            <input type="submit" value="Login">
-        </div>
-        <a href="/register">Cadastrar</a>
-
-
-    </form>
+    </div>
 </body>
 
 </html>
