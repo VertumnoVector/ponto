@@ -79,17 +79,24 @@
                         <table id="pontosTable" class="display">
                             <thead>
                                 <tr>
-                                    <th>Id</th>
-                                    <th>Hora registrada</th>
-                                    <th>Tipo</th>
+                                    
+                                    <th>Entrada</th>
+                                    <th>Saída</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>1</td>
-                                    <td>1</td>
-                                </tr>
+                                <% if (results && results.length > 0) { %>
+                                    <% results.forEach(function(result) { %>
+                                        <tr>
+                                            <td>
+                                                <%= result.starttime ? new Date(result.starttime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-' %>
+                                            </td>
+                                            <td>
+                                                <%= result.stoptime ? new Date(result.stoptime).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) : '-' %>
+                                            </td>
+                                        </tr>
+                                    <% }); %>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -98,6 +105,7 @@
                         <h2 class="m-3 text text-center">Novo registro</h2>
                         <form action="dashboard/create/" method="POST">
                             <div class="mb-3">
+                                <input type="hidden" name="user_id" value="<%= user_id%>">
                                 <input type="submit" class="btn btn-success w-100" value="Novo ponto">
                             </div>
                         </form>
@@ -136,17 +144,7 @@
         integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
     <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
 
-    <script>
-        const toastTrigger = document.getElementById('liveToastBtn');
-        const toastLiveExample = document.getElementById('liveToast');
-
-        if (toastTrigger) {
-            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
-            setTimeout(() => {
-                toastBootstrap.show();
-            }, 500);
-        };
-    </script>
+    <script src="dashboardController.js"></script>
     <script>
         $(document).ready(function () {
             // Inicializa o DataTables na tabela
@@ -158,17 +156,7 @@
         });
     </script>
 
-    <script>
-        function updateClock() {
-            const now = new Date();
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
-        }
-
-        setInterval(updateClock, 1000);
-    </script>
+   
 </body>
 
 </html>
