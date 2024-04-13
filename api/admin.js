@@ -4,6 +4,7 @@ const router = express.Router();
 const { pool } = require('../config/dbConfig');
 const bcrypt = require("bcrypt");
 
+
 router.get("/", checkAuthenticated, (req, res) => {
     if (req.user.isadmin) {
         pool.query(

@@ -1,14 +1,174 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/skeleton/2.0.4/skeleton.min.css" integrity="sha512-EZLkOqwILORob+p0BXZc+Vm3RgJBOe1Iq/0fiI7r/wJgzOFZMlsqTa29UEl6v6U6gsV4uIpsNZoV32YZqrCRCQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-
-    <title>Document</title>
+    <link rel="stylesheet" href="/scss/style.css">
+    <link rel="stylesheet" href="https://cdn.datatables.net/2.0.3/css/dataTables.dataTables.css" />
+    <title>Painel Usuário</title>
 </head>
+<style>
+    .clock-card {
+        text-align: center;
+    }
+
+    .clock {
+        font-size: 2rem;
+        margin-top: 10px;
+    }
+</style>
+
 <body>
-    <a href="/logout">Logout</a>
-    <h1>Olá <%=user.charAt(0).toUpperCase() + user.slice(1)%></h1>
+    <header>
+        <nav class="navbar bg-dark navbar-expand-lg border-bottom border-body" data-bs-theme="dark">
+            <div class="container-fluid roboto-black text ">
+                <a class="navbar-brand" href="#">
+                    <img src="../img/logo.png" alt="Logo" width="30" height="30" class="d-inline-block align-text-top">
+                    Painel de: <%=user.charAt(0).toUpperCase() + user.slice(1)%>
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                    aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav ms-auto">
+                        <li class="nav-item">
+                            <a href="/logout" class="btn btn-outline-danger">Logout</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container-fluid">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-auto">
+                    <h1 class="roboto-black text-uppercase text-center">Registro de pontos</h1>
+                </div>
+            </div>
+            <div class="row justify-content-center mb-3">
+                <div class="col-auto">
+                    <div class="card clock-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Agora</h5>
+                            <p class="card-text clock" id="clock"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row justify-content-center">
+            <div class="col-auto roboto-medium">
+                <ul class="nav nav-tabs" id="myTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link active" id="controle-tab" data-bs-toggle="tab" href="#controle" role="tab"
+                            aria-controls="controle" aria-selected="true">Controle</a>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <a class="nav-link" id="cadastro-tab" data-bs-toggle="tab" href="#cadastro" role="tab"
+                            aria-controls="cadastro" aria-selected="false">Nova Entrada/Saída</a>
+                    </li>
+                </ul>
+                <div class="tab-content" id="myTabContent">
+                    <div class="tab-pane fade show active" id="controle" role="tabpanel" aria-labelledby="controle-tab">
+                        <h2 class="m-3">Histórico</h2>
+                        <table id="pontosTable" class="display">
+                            <thead>
+                                <tr>
+                                    <th>Id</th>
+                                    <th>Hora registrada</th>
+                                    <th>Tipo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>1</td>
+                                    <td>1</td>
+                                    <td>1</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div class="tab-pane fade" id="cadastro" role="tabpanel" aria-labelledby="cadastro-tab">
+                        <h2 class="m-3 text text-center">Novo registro</h2>
+                        <form action="dashboard/create/" method="POST">
+                            <div class="mb-3">
+                                <input type="submit" class="btn btn-success w-100" value="Novo ponto">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!--ALERT TOAST-->
+    <input type="hidden" id="liveToastBtn">
+    <div class="toast-container position-fixed bottom-0 end-0 p-3 ">
+        <div id="liveToast" class="toast text-bg-primary" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <img src="/img/logo.png" width="50" class="rounded me-2" alt="...">
+                <strong class="me-auto">Aviso</strong>
+                <small>Agora</small>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+
+                <% if (typeof errors !=='undefined' && errors.length> 0) { %>
+                    <% errors.forEach(error=> { %>
+                        <%= error.message %>
+                            <% }) %>
+                                <% } else { %>
+                                    Bem-vindo, <%= user%>
+                                        <% } %>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"
+        integrity="sha256-/JqT3SQfawRcv/BIHPThkBvs0OEvtFFmqPF/lYI/Cxo=" crossorigin="anonymous"></script>
+    <script src="https://cdn.datatables.net/2.0.3/js/dataTables.js"></script>
+
+    <script>
+        const toastTrigger = document.getElementById('liveToastBtn');
+        const toastLiveExample = document.getElementById('liveToast');
+
+        if (toastTrigger) {
+            const toastBootstrap = bootstrap.Toast.getOrCreateInstance(toastLiveExample)
+            setTimeout(() => {
+                toastBootstrap.show();
+            }, 500);
+        };
+    </script>
+    <script>
+        $(document).ready(function () {
+            // Inicializa o DataTables na tabela
+            const dataTable = $('#pontosTable').DataTable({
+                "language": {
+                    "url": "//cdn.datatables.net/plug-ins/1.10.24/i18n/Portuguese.json"
+                }
+            });
+        });
+    </script>
+
+    <script>
+        function updateClock() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('clock').innerText = `${hours}:${minutes}:${seconds}`;
+        }
+
+        setInterval(updateClock, 1000);
+    </script>
 </body>
+
 </html>
