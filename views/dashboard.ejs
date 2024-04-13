@@ -50,7 +50,7 @@
                 </div>
             </div>
             <div class="row justify-content-center mb-3">
-                <div class="col-auto">
+                <div class="col-auto mt-1 col-sm-6"> <!-- Adicionado col-sm-6 para ocupar 50% da largura em dispositivos pequenos -->
                     <div class="card clock-card">
                         <div class="card-body">
                             <h5 class="card-title">Agora</h5>
@@ -58,8 +58,17 @@
                         </div>
                     </div>
                 </div>
+                <div class="col-auto mt-1 col-sm-6"> <!-- Adicionado col-sm-6 para ocupar 50% da largura em dispositivos pequenos -->
+                    <div class="card clock-card">
+                        <div class="card-body">
+                            <h5 class="card-title">Fim da jornada</h5>
+                            <p class="card-text clock" id="timeLeft"><%=jornada%></p>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+    </div>
         <hr>
         <div class="row justify-content-center">
             <div class="col-auto roboto-medium">
@@ -79,7 +88,6 @@
                         <table id="pontosTable" class="display">
                             <thead>
                                 <tr>
-                                    
                                     <th>Entrada</th>
                                     <th>Saída</th>
                                 </tr>

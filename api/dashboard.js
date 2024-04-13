@@ -2,6 +2,16 @@ const express = require('express');
 const router = express.Router();
 const { pool } = require('../config/dbConfig');
 
+async function getJornada(user_id) {
+  const query = `
+    SELECT timeleft FROM users
+    WHERE id = $1;`;
+  const values = [user_id];
+  const result = await pool.query(query, values);
+  return result.rows[0].timeleft;
+
+};
+
 async function verificarRegistroExistente(user_id) {
   const query = `
     SELECT id FROM registro_de_pontos
@@ -19,7 +29,6 @@ async function isIdPar(id) {
     WHERE user_id = $1;`;
 
   const values = [id];
-
   const result = await pool.query(query, values);
   const linhas = result.rows.length + 1;
 
@@ -29,26 +38,38 @@ async function isIdPar(id) {
 
 
 
-router.get('/', checkAuthenticated, (req, res) => {
+router.get('/', checkAuthenticated, async (req, res) => {
   if (req.user.isadmin) {
     return res.redirect('/admin');
   };
 
-  pool.query(
-    `SELECT id, starttime, stoptime FROM registro_de_pontos WHERE user_id = $1 order by id asc`,
-    [req.user.id],
-    (err, results) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res.render("dashboard", {
-          results: results.rows,
-          user: req.user.name,
-          user_id: req.user.id
-        });
+  // Captura o total de horas da jornada
+  try {
+    const jornada = await getJornada(req.user.id);
+    console.log(jornada);
+
+    // Popular a tabela dos horários
+    pool.query(
+      `SELECT id, starttime, stoptime FROM registro_de_pontos WHERE user_id = $1 ORDER BY id ASC`,
+      [req.user.id],
+      (err, results) => {
+        if (err) {
+          console.log(err);
+        } else {
+          res.render("dashboard", {
+            results: results.rows,
+            user: req.user.name,
+            user_id: req.user.id,
+            jornada: jornada  // Passa a constante jornada para o template
+          });
+        }
       }
-    }
-  );
+    );
+
+  } catch (error) {
+    console.error('Erro ao resgatar informação:', error);
+    res.status(500).json({ error: 'Erro ao resgatar informação' });
+  }
 });
 
 
