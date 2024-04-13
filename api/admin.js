@@ -7,7 +7,7 @@ const bcrypt = require("bcrypt");
 router.get("/", checkAuthenticated, (req, res) => {
     if (req.user.isadmin) {
         pool.query(
-            `SELECT id, username, email, isadmin FROM users order by id`,
+            `SELECT id, username, name, timeleft, email, isadmin FROM users order by id`,
             (err, results) => {
                 if (err) {
                     console.log(err);
@@ -23,27 +23,28 @@ router.get("/", checkAuthenticated, (req, res) => {
 });
 
 router.post("/create", async (req, res) => {
-    let { name, email, password, password2 } = req.body;
+    let { name, email, timeleft, password, password2 } = req.body;
 
     let errors = [];
 
-    console.log({
-        name,
-        email,
-        password,
-        password2
-    });
+    let year = 2024;
+    let random1 = Math.floor(Math.random() * 10);
+    let random2 = Math.floor(Math.random() * 10);
+    let random3 = Math.floor(Math.random() * 10);
+    let random4 = Math.floor(Math.random() * 10);
 
-    if (!name || !email || !password || !password2) {
-        errors.push({ message: "Please enter all fields" });
+    let username = `${year}${random1}${random2}${random3}${random4}`;
+
+    if (!name || !email || !timeleft || !password || !password2) {
+        errors.push({ message: "Por favror preencha todos os campos." });
     }
 
     if (password.length < 6) {
-        errors.push({ message: "Password must be a least 6 characters long" });
+        errors.push({ message: "A senha precisa ser pelo menos 6 caracteres." });
     }
 
     if (password !== password2) {
-        errors.push({ message: "Passwords do not match" });
+        errors.push({ message: "Senhas não conferem." });
     }
 
     if (errors.length > 0) {
@@ -61,29 +62,28 @@ router.post("/create", async (req, res) => {
                     console.log(err);
                 }
                 if (results.rows.length > 0) {
-                    errors.push({ message: "Email already registered" });
+                    errors.push({ message: "Email já registrado." });
                     return res.render("adminPanel", { errors });
                 } else {
                     pool.query(
-                        `INSERT INTO users (username, password, email, isadmin, name)
-                    VALUES ($1, $2, $3, $4, $5)
+                        `INSERT INTO users (username, password, timeleft, email, isadmin, name)
+                    VALUES ($1, $2, $3, $4, $5, $6)
                     RETURNING id, password`,
-                        [name, hashedPassword, email, false, name],
+                        [username, hashedPassword, timeleft, email, false, name],
                         (err, results) => {
                             if (err) {
                                 console.error(err)
                                 throw err;
                             }
                             console.log(results.rows);
-                            req.flash("success_msg", "You are now registered. Please log in");
-                            res.redirect("/login");
+                            req.flash("success_msg", "Usuário registrado.");
+                            res.redirect('/admin');
                         }
                     );
                 }
             }
         );
     }
-
 });
 
 router.post("/delete", checkAuthenticated, async (req, res) => {
@@ -107,5 +107,6 @@ function checkAuthenticated(req, res, next) {
     }
     res.redirect("/login");
 };
+
 
 module.exports = router;

@@ -58,29 +58,32 @@
                             <thead>
                                 <tr>
                                     <th>Id</th>
-                                    <th>Username</th>
+                                    <th>Matricula</th>
+                                    <th>Nome</th>
+                                    <th>Rotina</th>
                                     <th>Email</th>
                                     <th>Opções</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <% users.forEach(function(user) { %>
-                                    <% if (user.isadmin !==true) { %> <!-- Verifica se o usuário não é admin -->
-                                        <tr>
-                                            <td>
-                                                <%= user.id %>
-                                            </td>
-                                            <td>
-                                                <%= user.username %>
-                                            </td>
-                                            <td>
-                                                <%= user.email %>
-                                            </td>
-                                            <td><button class="btn btn-danger" data-user-id="<%= user.id %>"
-                                                    onclick="deleteUser('<%= user.id %>')">Delete</button></td>
-                                        </tr>
+                                <% if (users && users.length > 0) { %>
+                                    <% users.forEach(function(user) { %>
+                                        <% if (!user.isadmin) { %> 
+                                            <tr>
+                                                <td><%= user.id %></td>
+                                                <td><%= user.username %></td>
+                                                <td><%= user.name %></td>
+                                                <td><%= user.timeleft === 360 ? '6 horas' : (user.timeleft === 480 ? '8 horas' : user.timeleft) %></td>
+                                                <td><%= user.email %></td>
+                                                <td><button class="btn btn-danger" data-user-id="<%= user.id %>" onclick="deleteUser('<%= user.id %>')">Delete</button></td>
+                                            </tr>
                                         <% } %>
-                                            <% }); %>
+                                    <% }); %>
+                                <% } else { %>
+                                    <tr>
+                                        <td colspan="5">Nenhum usuário encontrado.</td>
+                                    </tr>
+                                <% } %>
                             </tbody>
                         </table>
                     </div>
@@ -97,11 +100,18 @@
                             </div>
                             <div class="mb-3">
                                 <input type="password" class="form-control" name="password" id="password"
-                                    placeholder="password" required>
+                                    placeholder="Senha" required>
                             </div>
                             <div class="mb-3">
                                 <input type="password" class="form-control" name="password2" id="password2"
-                                    placeholder="Confirm Password" required>
+                                    placeholder="Confirme a senha" required>
+                            </div>
+                            <div class="mb-3">
+                                <select class="form-select" aria-label="Default select example" id="timeleft" name="timeleft" required>
+                                    <option selected>Rotina de trabalho</option>
+                                    <option value=480>8 horas</option>
+                                    <option value=360>6 horas</option>
+                                </select>
                             </div>
                             <div class="mb-3">
                                 <input type="submit" class="btn btn-primary w-100" value="Cadastrar">
