@@ -42,10 +42,10 @@ router.get('/', checkAuthenticated, async (req, res) => {
   if (req.user.isadmin) {
     return res.redirect('/admin');
   };
-
   // Captura o total de horas da jornada
   try {
     const jornada = await getJornada(req.user.id);
+   
 
     // Popular a tabela dos horários
     pool.query(
@@ -65,7 +65,7 @@ router.get('/', checkAuthenticated, async (req, res) => {
             results: results.rows,
             user: req.user.name,
             user_id: req.user.id,
-            jornada: jornada  // Passa a constante jornada para o template
+            jornada: jornada
           });
         }
       }
@@ -111,7 +111,7 @@ router.post('/create', checkAuthenticated, async (req, res) => {
 
     const result = await pool.query(query, values);
     console.log('Registro de pontos inserido:', result.rows[0]);
-    res.status(201).json(result.rows[0]);
+    res.status(201).redirect('/');
   } catch (error) {
     console.error('Erro ao inserir registro de pontos:', error);
     res.status(500).json({ error: 'Erro ao inserir registro de pontos' });
