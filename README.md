@@ -401,3 +401,21 @@ VALUES
 - Modo tela cheia
 - Multiplataforma
 
+
+## Deploy teste
+
+https://ponto-wohs.onrender.com/
+
+#### Acesso administrador
+```http
+  admin
+  123
+```
+
+#### Acesso usuário
+```http
+  20240001
+  12345
+```
+
+
