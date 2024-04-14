@@ -177,7 +177,7 @@ Esta rota é responsável por excluir um usuário do banco de dados com base no 
 fetch('/', {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer seu-token-de-autenticacao'
+    'Content-Type': 'application/json'
   }
 })
   .then(response => response.json())
@@ -214,7 +214,7 @@ Esta rota é usada para renderizar a página inicial do dashboard. Se o usuário
 fetch('/', {
   method: 'GET',
   headers: {
-    'Authorization': 'Bearer seu-token-de-autenticacao'
+    'Content-Type': 'application/json'
   }
 })
   .then(response => response.json())
@@ -292,7 +292,7 @@ Partindo do princípio que seu ambiente de desenvolvimento ja possua instalado o
 #### Clone do projeto
 
 ```bash
-  git clone https://github.com/usuario/nome-do-repositorio.git
+  git clone https://github.com/usuario/ponto.git
 ```
 #### Dependências do projeto
 ```bash
