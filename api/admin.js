@@ -6,6 +6,9 @@ const bcrypt = require("bcrypt");
 
 
 router.get("/", checkAuthenticated, (req, res) => {
+    const errMsg = req.flash('err_msg');
+    const successMsg = req.flash('success');
+
     if (req.user.isadmin) {
         pool.query(
             `SELECT id, username, name, timeleft, email, isadmin FROM users order by id`,
@@ -13,7 +16,7 @@ router.get("/", checkAuthenticated, (req, res) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    res.render("adminPanel", { users: results.rows });
+                    res.render("adminPanel", { users: results.rows, errMsg });
                 }
             }
         );
@@ -23,7 +26,7 @@ router.get("/", checkAuthenticated, (req, res) => {
     }
 });
 
-router.post("/create", async (req, res) => {
+router.post("/create", checkAuthenticated,async (req, res) => {
     let { name, email, timeleft, password, password2 } = req.body;
 
     let errors = [];
@@ -49,7 +52,8 @@ router.post("/create", async (req, res) => {
     }
 
     if (errors.length > 0) {
-        res.render("adminPanel", { errors, name, email, password, password2 });
+        req.flash("err_msg", errors);
+        res.redirect("/");
     } else {
         hashedPassword = await bcrypt.hash(password, 10);
         console.log(hashedPassword);
@@ -64,7 +68,8 @@ router.post("/create", async (req, res) => {
                 }
                 if (results.rows.length > 0) {
                     errors.push({ message: "Email já registrado." });
-                    return res.render("adminPanel", { errors });
+                    req.flash("err_msg", errors);
+                    return res.redirect("/");
                 } else {
                     pool.query(
                         `INSERT INTO users (username, password, timeleft, email, isadmin, name)
