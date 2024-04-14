@@ -412,6 +412,11 @@ https://ponto-wohs.onrender.com/
   123
 ```
 
+#### Postman Tests
+```http
+ https://drive.google.com/file/d/1n47qj4QvRPODur8V1iCKaqSkMaQ9eWpF/view?usp=sharing
+```
+
 #### Acesso usuário
 ```http
   20240001
