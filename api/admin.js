@@ -78,7 +78,7 @@ router.post("/create", async (req, res) => {
                             }
                             console.log(results.rows);
                             req.flash("success_msg", "Usuário registrado.");
-                            res.redirect('/admin');
+                            res.redirect('/');
                         }
                     );
                 }
