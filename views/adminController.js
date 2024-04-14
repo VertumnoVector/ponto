@@ -22,7 +22,13 @@ function deleteUser(userId) {
             if (response.ok) {
                 window.location.reload(); // ou outra ação que você deseja fazer após a exclusão
             } else {
-                console.error('Erro ao excluir usuário:', response.statusText);
+                
+                Swal.fire({
+                    title: 'Não pode excluir',
+                    text: 'Este Colaborador tem registro no livro de pontos',
+                    icon: 'error',
+                    confirmButtonText: 'Ok'
+                  })
             }
         })
         .catch(error => {

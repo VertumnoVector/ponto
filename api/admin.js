@@ -5,7 +5,7 @@ const { pool } = require('../config/dbConfig');
 const bcrypt = require("bcrypt");
 
 
-router.get("/", checkAuthenticated, (req, res) => {
+router.get("/", checkAuthenticated, async (req, res) => {
     const errMsg = req.flash('err_msg');
     const successMsg = req.flash('success');
 
@@ -26,84 +26,73 @@ router.get("/", checkAuthenticated, (req, res) => {
     }
 });
 
-router.post("/create", checkAuthenticated,async (req, res) => {
-    let { name, email, timeleft, password, password2 } = req.body;
+router.post("/create", checkAuthenticated, async (req, res) => {
+    try {
+        const { name, email, timeleft, password, password2 } = req.body;
 
-    let errors = [];
+        const errors = [];
+        const year = 2024;
+        const random1 = Math.floor(Math.random() * 10);
+        const random2 = Math.floor(Math.random() * 10);
+        const random3 = Math.floor(Math.random() * 10);
+        const random4 = Math.floor(Math.random() * 10);
+        const username = `${year}${random1}${random2}${random3}${random4}`;
 
-    let year = 2024;
-    let random1 = Math.floor(Math.random() * 10);
-    let random2 = Math.floor(Math.random() * 10);
-    let random3 = Math.floor(Math.random() * 10);
-    let random4 = Math.floor(Math.random() * 10);
+        if (!name || !email || !timeleft || !password || !password2) {
+            errors.push({ message: "Por favor, preencha todos os campos." });
+        }
 
-    let username = `${year}${random1}${random2}${random3}${random4}`;
+        if (password.length < 6) {
+            errors.push({ message: "A senha precisa ter pelo menos 6 caracteres." });
+        }
 
-    if (!name || !email || !timeleft || !password || !password2) {
-        errors.push({ message: "Por favror preencha todos os campos." });
-    }
+        if (password !== password2) {
+            errors.push({ message: "As senhas não conferem." });
+        }
 
-    if (password.length < 6) {
-        errors.push({ message: "A senha precisa ser pelo menos 6 caracteres." });
-    }
+        if (errors.length > 0) {
+            req.flash("err_msg", errors);
+            return res.status(401).redirect("/");
+        }
+        
 
-    if (password !== password2) {
-        errors.push({ message: "Senhas não conferem." });
-    }
-
-    if (errors.length > 0) {
-        req.flash("err_msg", errors);
-        res.redirect("/");
-    } else {
-        hashedPassword = await bcrypt.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         console.log(hashedPassword);
-        // Validation passed
-        pool.query(
-            `SELECT * FROM users
-            WHERE email = $1`,
-            [email],
-            (err, results) => {
-                if (err) {
-                    console.log(err);
-                }
-                if (results.rows.length > 0) {
-                    errors.push({ message: "Email já registrado." });
-                    req.flash("err_msg", errors);
-                    return res.redirect("/");
-                } else {
-                    pool.query(
-                        `INSERT INTO users (username, password, timeleft, email, isadmin, name)
-                    VALUES ($1, $2, $3, $4, $5, $6)
-                    RETURNING id, password`,
-                        [username, hashedPassword, timeleft, email, false, name],
-                        (err, results) => {
-                            if (err) {
-                                console.error(err)
-                                throw err;
-                            }
-                            console.log(results.rows);
-                            req.flash("success_msg", "Usuário registrado.");
-                            res.redirect('/');
-                        }
-                    );
-                }
-            }
+
+        const existingUser = await pool.query(`SELECT * FROM users WHERE email = $1`, [email]);
+        if (existingUser.rows.length > 0) {
+            errors.push({ message: "Email já registrado." });
+            req.flash("err_msg", errors);
+            return res.status(401).redirect("/");
+        }
+
+        const newUser = await pool.query(
+            `INSERT INTO users (username, password, timeleft, email, isadmin, name)
+            VALUES ($1, $2, $3, $4, $5, $6)
+            RETURNING id, password`,
+            [username, hashedPassword, timeleft, email, false, name]
         );
+        console.log(newUser.rows);
+        req.flash("success_msg", "Usuário registrado.");
+        return res.status(302).redirect("/");
+    } catch (err) {
+        console.error(err);
+        req.flash("err_msg", [{ message: "Erro ao registrar usuário." }]);
+        return res.status(401).redirect("/");
     }
 });
 
 router.post("/delete", checkAuthenticated, async (req, res) => {
-    const userId = req.body.userId;
+    const userId = req.body.userId; 
 
     try {
         // Implemente a lógica para excluir o usuário do banco de dados
         await pool.query(`DELETE FROM users WHERE id = $1`, [userId]);
 
-        // Envie uma resposta de sucesso
         res.sendStatus(200);
     } catch (err) {
         console.error(err);
-        res.status(500).send("Erro ao excluir usuário");
+        res.status(500).send({ message: "Erro: Colaborador com registro ativo." });
     }
 });
 
