@@ -49,7 +49,6 @@ router.post("/create", async (req, res) => {
     }
 
     if (errors.length > 0) {
-        console.log('tem erro')
         res.render("adminPanel", { errors, name, email, password, password2 });
     } else {
         hashedPassword = await bcrypt.hash(password, 10);
