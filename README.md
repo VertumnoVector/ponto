@@ -292,7 +292,7 @@ Partindo do princípio que seu ambiente de desenvolvimento ja possua instalado o
 #### Clone do projeto
 
 ```bash
-  git clone https://github.com/usuario/ponto.git
+  git clone https://github.com/VertumnoVector/ponto.git
 ```
 #### Dependências do projeto
 ```bash
